@@ -48,10 +48,13 @@ namespace ObsGameBarWidget
         private static SolidColorBrush BrushConnecting => NewBrush(255, 185, 0);     // Orange
         private static SolidColorBrush BrushConnected => NewBrush(16, 124, 65);      // Green
 
-        private static SolidColorBrush BrushCardDark => NewBrush(37, 40, 48);
-        private static SolidColorBrush BrushRecordActive => NewBrush(180, 24, 28);
+        private static SolidColorBrush BrushCardDark => NewBrush(58, 60, 66);        // Bouton Game Bar standard
+        private static SolidColorBrush BrushRecordActive => NewBrush(196, 43, 28);
         private static SolidColorBrush BrushStreamActive => NewBrush(100, 65, 165);  // Twitch purple
-        private static SolidColorBrush BrushAccentBlue => NewBrush(0, 120, 215);
+        private static SolidColorBrush BrushAccentBlue => NewBrush(0, 120, 212);
+
+        public Visibility DisconnectedHintVisibility =>
+            _obsService?.State == ObsConnectionState.Connected ? Visibility.Collapsed : Visibility.Visible;
 
         // Binding Properties
         public SolidColorBrush StatusBrush =>
@@ -194,7 +197,8 @@ namespace ObsGameBarWidget
                 NotifyBindings(
                     nameof(StatusBrush),
                     nameof(StatusText),
-                    nameof(ConnectButtonText));
+                    nameof(ConnectButtonText),
+                    nameof(DisconnectedHintVisibility));
 
                 if (state != ObsConnectionState.Connected)
                 {

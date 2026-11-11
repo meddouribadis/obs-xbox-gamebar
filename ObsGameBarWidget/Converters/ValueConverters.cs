@@ -26,8 +26,8 @@ namespace ObsGameBarWidget.Converters
 
     public class SceneBackgroundConverter : IValueConverter
     {
-        private static SolidColorBrush ActiveBrush => new SolidColorBrush(Color.FromArgb(255, 0, 120, 215));
-        private static SolidColorBrush InactiveBrush => new SolidColorBrush(Color.FromArgb(255, 42, 45, 54));
+        private static SolidColorBrush ActiveBrush => new SolidColorBrush(Color.FromArgb(255, 70, 74, 84));
+        private static SolidColorBrush InactiveBrush => new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
@@ -50,7 +50,7 @@ namespace ObsGameBarWidget.Converters
     public class MuteBackgroundConverter : IValueConverter
     {
         private static SolidColorBrush MutedBrush => new SolidColorBrush(Color.FromArgb(255, 209, 52, 56)); // Red
-        private static SolidColorBrush UnmutedBrush => new SolidColorBrush(Color.FromArgb(255, 54, 58, 71)); // Dark grey
+        private static SolidColorBrush UnmutedBrush => new SolidColorBrush(Color.FromArgb(255, 58, 60, 66)); // Dark grey
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
@@ -74,7 +74,7 @@ namespace ObsGameBarWidget.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return (value is bool b && b) ? "Mute" : "Actif";
+            return (value is bool b && b) ? "Muet" : "Actif";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();

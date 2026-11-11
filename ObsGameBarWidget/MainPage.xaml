@@ -8,7 +8,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="#17191E">
+    RequestedTheme="Dark"
+    Background="#25272B">
 
     <Page.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -17,228 +18,236 @@
         <converters:MuteIconConverter x:Key="MuteIconConverter"/>
         <converters:MuteTextConverter x:Key="MuteTextConverter"/>
 
-        <!-- Styles pour boutons de contrôle -->
+        <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+        <!-- Style "natif" Game Bar : bouton plein, coins arrondis, fine bordure -->
         <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Height" Value="54"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="Padding" Value="12,0"/>
             <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#33FFFFFF"/>
-            <Setter Property="Background" Value="#252830"/>
+            <Setter Property="BorderBrush" Value="#5B5E65"/>
+            <Setter Property="Background" Value="#3A3C42"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Margin" Value="3"/>
+            <Setter Property="FontSize" Value="14"/>
         </Style>
 
-        <Style x:Key="SceneButtonStyle" TargetType="Button">
+        <!-- Petit bouton carre (icone seule) -->
+        <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="44"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <!-- Ligne de liste (scenes) -->
+        <Style x:Key="ListRowButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#22FFFFFF"/>
-            <Setter Property="Background" Value="#2A2D36"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="MinHeight" Value="48"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Margin" Value="2,3"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style x:Key="SecondaryTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#B4B7BD"/>
         </Style>
     </Page.Resources>
 
-    <Grid Background="#17191E">
+    <Grid>
         <Grid.RowDefinitions>
-            <!-- En-tête / Barre de statut -->
             <RowDefinition Height="Auto"/>
-            <!-- Notification toast -->
             <RowDefinition Height="Auto"/>
-            <!-- Contenu principal -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- EN-TETE -->
-        <Border Grid.Row="0" Background="#20232B" Padding="12,10" BorderBrush="#2F333D" BorderThickness="0,0,0,1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+        <!-- EN-TETE : titre + statut + connexion + parametres -->
+        <Grid Grid.Row="0" Padding="16,14,16,10" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-                <!-- Titre -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Ellipse Width="10" Height="10" Fill="{x:Bind StatusBrush, Mode=OneWay}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                    <TextBlock Text="OBS Studio" FontWeight="Bold" FontSize="14" Foreground="White" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="OBS Studio" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Ellipse Width="8" Height="8" Fill="{x:Bind StatusBrush, Mode=OneWay}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind StatusText, Mode=OneWay}" Style="{StaticResource SecondaryTextStyle}"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Grid.Column="1" Click="OnConnectToggleClicked" Style="{StaticResource ActionButtonStyle}"
+                    MinHeight="36" Padding="14,0" FontSize="13" VerticalAlignment="Center">
+                <TextBlock Text="{x:Bind ConnectButtonText, Mode=OneWay}"/>
+            </Button>
+
+            <Button Grid.Column="2" Click="OnSettingsToggleClicked" Style="{StaticResource IconButtonStyle}"
+                    Width="36" MinHeight="36" VerticalAlignment="Center">
+                <FontIcon FontFamily="{StaticResource IconFont}" Glyph="&#xE713;" FontSize="16"/>
+            </Button>
+        </Grid>
+
+        <!-- NOTIFICATION -->
+        <Border Grid.Row="1" x:Name="NotificationBanner" Visibility="Collapsed" Background="#2E7D4F"
+                CornerRadius="6" Margin="16,0,16,8" Padding="12,8">
+            <TextBlock x:Name="NotificationText" Text="" FontSize="12" Foreground="White" TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- CONTENU -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Padding="16,0,16,16" Spacing="8">
+
+                <!-- DIFFUSER -->
+                <Button Click="OnStreamClicked" Style="{StaticResource ActionButtonStyle}" MinHeight="52"
+                        Background="{x:Bind StreamBackgroundBrush, Mode=OneWay}">
+                    <Grid HorizontalAlignment="Stretch" ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon FontFamily="{StaticResource IconFont}" Glyph="&#xE93E;" FontSize="16"
+                                  Foreground="{x:Bind StreamIconBrush, Mode=OneWay}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind StreamButtonLabel, Mode=OneWay}" HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{x:Bind StreamTimecodeText, Mode=OneWay}"
+                                   Style="{StaticResource SecondaryTextStyle}" Foreground="#E6E7EA" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+
+                <!-- ENREGISTRER -->
+                <!-- NB : StackPanel.Spacing compte aussi les enfants Collapsed (UWP) -> on utilise un Margin sur le bouton Pause -->
+                <StackPanel>
+                    <Button Click="OnRecordClicked" Style="{StaticResource ActionButtonStyle}" MinHeight="52"
+                            Background="{x:Bind RecordBackgroundBrush, Mode=OneWay}">
+                        <Grid HorizontalAlignment="Stretch" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Width="12" Height="12" Fill="{x:Bind RecordIconBrush, Mode=OneWay}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{x:Bind RecordButtonLabel, Mode=OneWay}" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{x:Bind RecordTimecodeText, Mode=OneWay}"
+                                       Style="{StaticResource SecondaryTextStyle}" Foreground="#E6E7EA" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Click="OnRecordPauseClicked" Style="{StaticResource ActionButtonStyle}" Margin="0,8,0,0"
+                            Visibility="{x:Bind RecordPauseVisibility, Mode=OneWay}">
+                        <TextBlock Text="{x:Bind RecordPauseLabel, Mode=OneWay}"/>
+                    </Button>
                 </StackPanel>
 
-                <!-- Statut de connexion -->
-                <TextBlock Grid.Column="1" Text="{x:Bind StatusText, Mode=OneWay}"
-                           FontSize="11" Foreground="#A0A5B5" VerticalAlignment="Center" Margin="10,0,0,0" TextTrimming="CharacterEllipsis"/>
-
-                <!-- Bouton Reconnecter / Déconnecter -->
-                <Button Grid.Column="2" Click="OnConnectToggleClicked" Margin="0,0,6,0" Padding="8,4" CornerRadius="4"
-                        Background="#2D313B" BorderBrush="#3D4250" BorderThickness="1">
-                    <TextBlock Text="{x:Bind ConnectButtonText, Mode=OneWay}" FontSize="11" Foreground="White"/>
-                </Button>
-
-                <!-- Bouton Paramètres (Engrenage) -->
-                <Button Grid.Column="3" Click="OnSettingsToggleClicked" Padding="8,4" CornerRadius="4"
-                        Background="#2D313B" BorderBrush="#3D4250" BorderThickness="1">
-                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="13" Foreground="White"/>
-                </Button>
-            </Grid>
-        </Border>
-
-        <!-- BANNIERE DE NOTIFICATION -->
-        <Border Grid.Row="1" x:Name="NotificationBanner" Visibility="Collapsed" Background="#0E7036" Padding="10,6">
-            <TextBlock x:Name="NotificationText" Text="Clip sauvegardé avec succès !" FontSize="11" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center"/>
-        </Border>
-
-        <!-- CONTENU PRINCIPAL SCROLLABLE -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Padding="10" Spacing="10">
-
-                <!-- SECTION 1 : ACTIONS RAPIDES (ENREGISTREMENT & STREAM) -->
-                <TextBlock Text="ACTIONS EN DIRECT" FontSize="11" FontWeight="Bold" Foreground="#888E9E" Margin="2,4,0,0"/>
-
-                <Grid>
+                <!-- CLIP + CAMERA VIRTUELLE -->
+                <Grid ColumnSpacing="8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- BOUTON ENREGISTRER (REC) -->
-                    <Border Grid.Column="0" Margin="3" CornerRadius="6" Background="{x:Bind RecordBackgroundBrush, Mode=OneWay}"
-                            BorderBrush="#44FFFFFF" BorderThickness="1">
-                        <Grid Padding="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Button Click="OnRecordClicked" Style="{StaticResource ActionButtonStyle}" Background="Transparent" BorderThickness="0" Margin="0" Height="44">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Ellipse Width="12" Height="12" Fill="{x:Bind RecordIconBrush, Mode=OneWay}" Margin="0,0,6,0"/>
-                                    <TextBlock Text="{x:Bind RecordButtonLabel, Mode=OneWay}" FontWeight="Bold" FontSize="13"/>
-                                </StackPanel>
-                            </Button>
-
-                            <TextBlock Grid.Row="1" Text="{x:Bind RecordTimecodeText, Mode=OneWay}"
-                                       FontSize="11" Foreground="#C0C5D0" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-
-                            <!-- Bouton Pause Enregistrement -->
-                            <Button Grid.Row="2" Click="OnRecordPauseClicked" Visibility="{x:Bind RecordPauseVisibility, Mode=OneWay}"
-                                    HorizontalAlignment="Center" Margin="0,4,0,0" Padding="6,2" CornerRadius="3"
-                                    Background="#33000000" BorderThickness="0">
-                                <TextBlock Text="{x:Bind RecordPauseLabel, Mode=OneWay}" FontSize="10" Foreground="#E0E0E0"/>
-                            </Button>
-                        </Grid>
-                    </Border>
-
-                    <!-- BOUTON STREAM (DIFFUSER) -->
-                    <Border Grid.Column="1" Margin="3" CornerRadius="6" Background="{x:Bind StreamBackgroundBrush, Mode=OneWay}"
-                            BorderBrush="#44FFFFFF" BorderThickness="1">
-                        <Grid Padding="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Button Click="OnStreamClicked" Style="{StaticResource ActionButtonStyle}" Background="Transparent" BorderThickness="0" Margin="0" Height="44">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE93E;" FontSize="14" Foreground="{x:Bind StreamIconBrush, Mode=OneWay}" Margin="0,0,6,0"/>
-                                    <TextBlock Text="{x:Bind StreamButtonLabel, Mode=OneWay}" FontWeight="Bold" FontSize="13"/>
-                                </StackPanel>
-                            </Button>
-
-                            <TextBlock Grid.Row="1" Text="{x:Bind StreamTimecodeText, Mode=OneWay}"
-                                       FontSize="11" Foreground="#C0C5D0" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-                        </Grid>
-                    </Border>
-                </Grid>
-
-                <!-- SECTION 2 : REPLAY BUFFER & CAMERA VIRTUELLE -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Sauvegarder Clip / Replay Buffer -->
                     <Button Grid.Column="0" Click="OnSaveReplayClicked" Style="{StaticResource ActionButtonStyle}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE768;" FontSize="14" Foreground="#FFD700" Margin="0,0,6,0"/>
-                            <TextBlock Text="Sauver Clip" FontWeight="SemiBold" FontSize="12"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="{StaticResource IconFont}" Glyph="&#xE768;" FontSize="14"/>
+                            <TextBlock Text="Sauver clip" FontSize="13"/>
                         </StackPanel>
                     </Button>
 
-                    <!-- Caméra Virtuelle -->
                     <Button Grid.Column="1" Click="OnVirtualCamClicked" Style="{StaticResource ActionButtonStyle}"
                             Background="{x:Bind VirtualCamBackgroundBrush, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE714;" FontSize="14" Margin="0,0,6,0"/>
-                            <TextBlock Text="{x:Bind VirtualCamButtonLabel, Mode=OneWay}" FontWeight="SemiBold" FontSize="12"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="{StaticResource IconFont}" Glyph="&#xE714;" FontSize="14"/>
+                            <TextBlock Text="{x:Bind VirtualCamButtonLabel, Mode=OneWay}" FontSize="13"/>
                         </StackPanel>
                     </Button>
                 </Grid>
 
-                <!-- SECTION 3 : SCENES -->
-                <Grid Margin="0,6,0,0">
+                <!-- Separateur -->
+                <Rectangle Height="1" Fill="#3A3C42" Margin="0,8,0,4"/>
+
+                <!-- SCENES -->
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="SCÈNES" FontSize="11" FontWeight="Bold" Foreground="#888E9E" VerticalAlignment="Center"/>
-                    <Button Grid.Column="1" Click="OnRefreshScenesClicked" Padding="6,2" CornerRadius="3" Background="Transparent" BorderThickness="0">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" FontSize="11" Foreground="#888E9E"/>
+                    <TextBlock Text="Scènes" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Click="OnRefreshScenesClicked" Background="Transparent" BorderThickness="0"
+                            Padding="8" CornerRadius="6" Foreground="#B4B7BD">
+                        <FontIcon FontFamily="{StaticResource IconFont}" Glyph="&#xE72C;" FontSize="14"/>
                     </Button>
                 </Grid>
+
+                <Grid>
+                <TextBlock Text="Connectez-vous à OBS pour afficher les scènes et les sources audio."
+                           Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"
+                           Visibility="{x:Bind DisconnectedHintVisibility, Mode=OneWay}"/>
 
                 <ItemsControl ItemsSource="{x:Bind ScenesList}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:ObsSceneItem">
-                            <Button Click="OnSceneItemClicked" Style="{StaticResource SceneButtonStyle}"
+                            <Button Click="OnSceneItemClicked" Style="{StaticResource ListRowButtonStyle}"
                                     Background="{x:Bind IsCurrent, Converter={StaticResource SceneBackgroundConverter}, Mode=OneWay}">
-                                <Grid HorizontalAlignment="Stretch">
+                                <Grid ColumnSpacing="12">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{x:Bind Name}" FontSize="12"
-                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                    <Ellipse Grid.Column="1" Width="8" Height="8" Fill="#00D26A"
-                                             Visibility="{x:Bind IsCurrent, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                             VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                    <FontIcon FontFamily="{StaticResource IconFont}" Glyph="&#xE8B9;" FontSize="16"
+                                              Foreground="#B4B7BD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{x:Bind Name}" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <FontIcon Grid.Column="2" FontFamily="{StaticResource IconFont}" Glyph="&#xE73E;" FontSize="14"
+                                              Foreground="#4CC2FF" VerticalAlignment="Center"
+                                              Visibility="{x:Bind IsCurrent, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                </Grid>
 
-                <!-- SECTION 4 : MIXEUR AUDIO RAPIDE -->
-                <TextBlock Text="AUDIO / MUTE RAPIDE" FontSize="11" FontWeight="Bold" Foreground="#888E9E" Margin="2,8,0,0"/>
+                <!-- Separateur -->
+                <Rectangle Height="1" Fill="#3A3C42" Margin="0,8,0,4"/>
+
+                <!-- AUDIO -->
+                <TextBlock Text="Audio" Style="{StaticResource SectionTitleStyle}"/>
 
                 <ItemsControl ItemsSource="{x:Bind AudioInputsList}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:ObsAudioInput">
-                            <Border Margin="0,2" Padding="8,6" CornerRadius="4" Background="#242730" BorderBrush="#2D303C" BorderThickness="1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{x:Bind Name}" FontSize="12" Foreground="White" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                    <Button Grid.Column="1" Click="OnAudioMuteClicked" Padding="8,4" CornerRadius="4"
-                                            Background="{x:Bind IsMuted, Converter={StaticResource MuteBackgroundConverter}, Mode=OneWay}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="Segoe MDL2 Assets"
-                                                       Text="{x:Bind IsMuted, Converter={StaticResource MuteIconConverter}, Mode=OneWay}"
-                                                       FontSize="12" Foreground="White" Margin="0,0,4,0"/>
-                                            <TextBlock Text="{x:Bind IsMuted, Converter={StaticResource MuteTextConverter}, Mode=OneWay}"
-                                                       FontSize="11" Foreground="White"/>
-                                        </StackPanel>
-                                    </Button>
-                                </Grid>
-                            </Border>
+                            <Grid ColumnSpacing="12" Margin="0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Click="OnAudioMuteClicked" Style="{StaticResource IconButtonStyle}"
+                                        Background="{x:Bind IsMuted, Converter={StaticResource MuteBackgroundConverter}, Mode=OneWay}">
+                                    <FontIcon FontFamily="{StaticResource IconFont}" FontSize="16"
+                                              Glyph="{x:Bind IsMuted, Converter={StaticResource MuteIconConverter}, Mode=OneWay}"/>
+                                </Button>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind Name}" FontSize="14" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{x:Bind IsMuted, Converter={StaticResource MuteTextConverter}, Mode=OneWay}"
+                                               Style="{StaticResource SecondaryTextStyle}"/>
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -246,50 +255,34 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- VOLET PARAMETRES (OVERLAY) -->
-        <Border Grid.Row="0" Grid.RowSpan="3" x:Name="SettingsOverlay" Visibility="Collapsed"
-                Background="#EE17191E" Padding="16">
+        <!-- PARAMETRES (overlay) -->
+        <Border Grid.Row="0" Grid.RowSpan="3" x:Name="SettingsOverlay" Visibility="Collapsed" Background="#25272B">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel Spacing="12">
+                <StackPanel Padding="16,14,16,16" Spacing="14">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Paramètres OBS WebSocket" FontSize="15" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                        <Button Grid.Column="1" Click="OnSettingsCloseClicked" Background="Transparent" BorderThickness="0" Padding="6">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE711;" FontSize="13" Foreground="White"/>
+                        <TextBlock Text="Paramètres" FontSize="18" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Click="OnSettingsCloseClicked" Style="{StaticResource IconButtonStyle}"
+                                Width="36" MinHeight="36">
+                            <FontIcon FontFamily="{StaticResource IconFont}" Glyph="&#xE711;" FontSize="14"/>
                         </Button>
                     </Grid>
 
-                    <TextBlock Text="Configurez les accès au serveur OBS WebSocket (OBS Studio > Outils > Paramètres du serveur WebSocket)."
-                               FontSize="11" Foreground="#A0A5B5" TextWrapping="Wrap"/>
+                    <TextBlock Text="Accès au serveur OBS WebSocket (OBS Studio > Outils > Paramètres du serveur WebSocket)."
+                               Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
 
-                    <!-- Hôte / IP -->
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Hôte / IP (défaut : 127.0.0.1)" FontSize="11" Foreground="#CCD0DC"/>
-                        <TextBox x:Name="HostInput" PlaceholderText="127.0.0.1" Background="#262933" Foreground="White" BorderBrush="#3E4352"/>
-                    </StackPanel>
+                    <TextBox x:Name="HostInput" Header="Hôte / IP" PlaceholderText="127.0.0.1"/>
+                    <TextBox x:Name="PortInput" Header="Port" PlaceholderText="4455" InputScope="Number"/>
+                    <PasswordBox x:Name="PasswordInput" Header="Mot de passe WebSocket" PlaceholderText="Optionnel"/>
 
-                    <!-- Port -->
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Port (défaut : 4455)" FontSize="11" Foreground="#CCD0DC"/>
-                        <TextBox x:Name="PortInput" PlaceholderText="4455" InputScope="Number" Background="#262933" Foreground="White" BorderBrush="#3E4352"/>
-                    </StackPanel>
+                    <CheckBox x:Name="AutoConnectCheck" Content="Connexion automatique à l'ouverture"/>
 
-                    <!-- Mot de passe -->
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Mot de passe WebSocket" FontSize="11" Foreground="#CCD0DC"/>
-                        <PasswordBox x:Name="PasswordInput" PlaceholderText="Optionnel si sans mot de passe" Background="#262933" Foreground="White" BorderBrush="#3E4352"/>
-                    </StackPanel>
-
-                    <!-- Connexion automatique -->
-                    <CheckBox x:Name="AutoConnectCheck" Content="Connexion automatique à l'ouverture" Foreground="White" FontSize="12"/>
-
-                    <!-- Bouton Sauvegarder & Reconnecter -->
-                    <Button Click="OnSaveSettingsClicked" HorizontalAlignment="Stretch" Height="40"
-                            Background="#0078D7" Foreground="White" FontWeight="Bold" CornerRadius="4" Margin="0,10,0,0">
-                        <TextBlock Text="Enregistrer et Connecter"/>
+                    <Button Click="OnSaveSettingsClicked" Style="{StaticResource ActionButtonStyle}"
+                            Background="#0078D4" BorderBrush="#2B8CE0" FontWeight="SemiBold" Margin="0,6,0,0">
+                        <TextBlock Text="Enregistrer et connecter"/>
                     </Button>
                 </StackPanel>
             </ScrollViewer>
