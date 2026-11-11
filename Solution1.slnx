@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+    <Platform Name="ARM64" />
+    <Platform Name="Any CPU" />
+  </Configurations>
+  <Project Path="ObsGameBarWidget/ObsGameBarWidget.csproj">
+    <Deploy Solution="Debug|x64" />
+  </Project>
+</Solution>

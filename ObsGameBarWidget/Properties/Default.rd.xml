@@ -1,0 +1,9 @@
+<Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
+  <Application>
+    <!--
+      An Application element with Analyze="All" will include all types in the application
+      in the metadata database for dynamic code execution.
+    -->
+    <Assembly Name="*Application*" Dynamic="Required All" />
+  </Application>
+</Directives>

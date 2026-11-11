@@ -1,0 +1,10 @@
+.vs/
+bin/
+obj/
+AppPackages/
+BundleArtifacts/
+*.user
+*.suo
+*.appxsym
+*.msix
+*.log
