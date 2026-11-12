@@ -146,6 +146,18 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\OBSLogo.png" />
     <Content Include="GameBar\.keep" />
+    <Content Include="GameBar\Icons\icon.targetsize-16.png" />
+    <Content Include="GameBar\Icons\icon.light.targetsize-16.png" />
+    <Content Include="GameBar\Icons\icon.targetsize-20.png" />
+    <Content Include="GameBar\Icons\icon.light.targetsize-20.png" />
+    <Content Include="GameBar\Icons\icon.targetsize-24.png" />
+    <Content Include="GameBar\Icons\icon.light.targetsize-24.png" />
+    <Content Include="GameBar\Icons\icon.targetsize-32.png" />
+    <Content Include="GameBar\Icons\icon.light.targetsize-32.png" />
+    <Content Include="GameBar\Icons\icon.targetsize-44.png" />
+    <Content Include="GameBar\Icons\icon.light.targetsize-44.png" />
+    <Content Include="GameBar\Icons\icon.targetsize-256.png" />
+    <Content Include="GameBar\Icons\icon.light.targetsize-256.png" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
