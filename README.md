@@ -1,96 +1,89 @@
-# 🎮 OBS Controller - Xbox Game Bar Widget
+# OBS Game Bar Widget
 
-Widget officiel pour la **Xbox Game Bar** (`Win + G`) permettant de piloter **OBS Studio** directement en superposition au-dessus de vos jeux vidéo, sans avoir besoin d'effectuer de Alt+Tab.
+A lightweight Windows Xbox Game Bar (`Win + G`) widget to control and monitor OBS Studio directly in-game without needing to Alt+Tab.
 
----
-
-## ✨ Fonctionnalités
-
-* 🔴 **Contrôle de l'Enregistrement (REC)** : Démarrer, arrêter, mettre en pause et reprendre l'enregistrement avec chronomètre en direct.
-* 📡 **Contrôle du Streaming (LIVE)** : Lancer ou couper la diffusion en direct avec chronomètre.
-* ⚡ **Sauvegarde instantanée de Clip (Replay Buffer)** : Sauvegardez les X dernières secondes de jeu en un clic (comme ShadowPlay mais via OBS !).
-* 📷 **Caméra Virtuelle** : Activer / désactiver la caméra virtuelle OBS (utile pour Discord, etc.).
-* 🎬 **Sélecteur de Scènes interactif** : Liste synchronisée en temps réel avec OBS, mise en évidence de la scène active et changement de scène instantané.
-* 🎙️ **Mixeur Audio & Mute Rapide** : Visualisation et bascule Mute/Unmute pour le microphone et le son du système.
-* 📌 **Mode Épinglé (Pin)** : Grâce à la Xbox Game Bar, vous pouvez épingler le widget dans un coin de votre écran, régler sa transparence et continuer à jouer avec les contrôles toujours sous les yeux.
+Built with UWP and C#, designed to match the native Windows Game Bar design system.
 
 ---
 
-## 🛠️ Prérequis
+## Features
 
-1. **Windows 10 (2004+) ou Windows 11** avec l'application Xbox Game Bar installée.
-2. **OBS Studio 28+** (OBS Studio 33 est déjà installé sur votre machine).
-3. **Visual Studio Community** avec la charge de travail :
-   * **Développement pour la plateforme Windows universelle (UWP)** *(Universal Windows Platform development)*.
-
----
-
-## ⚙️ Étape 1 : Activer le serveur WebSocket dans OBS Studio
-
-1. Lancez **OBS Studio**.
-2. Dans le menu supérieur, cliquez sur **Outils** > **Paramètres du serveur WebSocket**.
-3. Cochez **Activer le serveur WebSocket**.
-4. Vérifiez que le port est bien **4455** (port par défaut).
-5. *(Optionnel)* Si vous définissez un mot de passe, notez-le pour le renseigner dans le widget.
-6. Cliquez sur **Appliquer** puis **OK**.
+- **Recording**: Start, stop, pause, and resume recording with an active duration timer.
+- **Streaming**: Start and stop stream broadcasts with live uptime.
+- **Replay Buffer**: Save instant gameplay replay clips in one click.
+- **Virtual Camera**: Toggle the OBS virtual camera on or off.
+- **Scene Switching**: Real-time synchronized scene list with active scene indicator and one-tap switching.
+- **Audio Controls**: Mute and unmute toggles for desktop audio and microphone.
+- **In-Game Overlay**: Pin the widget over any game, position it anywhere, and adjust opacity via native Game Bar settings.
 
 ---
 
-## 🚀 Étape 2 : Compiler et Déployer le Widget
+## Requirements
 
-1. Ouvrez la solution `Solution1.slnx` (ou `Solution1.sln`) dans **Visual Studio Community**.
-2. Dans la barre d'outils supérieure :
-   * Choisissez la configuration : `Debug` ou `Release`.
-   * Choisissez l'architecture : `x64` (ou `ARM64` si processeur Snapdragon).
-3. Faites un **clic droit** sur le projet `ObsGameBarWidget` dans l'Explorateur de solutions et cliquez sur **Déployer** (ou appuyez simplement sur `F5`).
-4. Windows déploie le package et l'enregistre automatiquement auprès du système Xbox Game Bar.
+- **Windows 10 (version 2004+) or Windows 11** with Xbox Game Bar installed.
+- **OBS Studio 28+** (uses the built-in obs-websocket v5 protocol).
+- **Visual Studio 2022** (if building from source) with the **Universal Windows Platform development** workload.
 
 ---
 
-## 🔓 Étape 3 : Autoriser la connexion localhost (Loopback)
+## Setup
 
-Sous Windows, les applications UWP fonctionnent dans un conteneur sécurisé (*AppContainer*) qui bloque par défaut les connexions vers `127.0.0.1` (`localhost`).
+### 1. Enable WebSocket Server in OBS Studio
 
-Pour autoriser le widget à se connecter à OBS sur `localhost:4455`, ouvrez PowerShell et exécutez le script fourni :
+1. Open OBS Studio.
+2. In the top menu, go to **Tools** > **WebSocket Server Settings**.
+3. Check **Enable WebSocket server**.
+4. Confirm the port is set to **4455** (default).
+5. If authentication is enabled, note your server password.
+6. Click **Apply**, then **OK**.
+
+### 2. Build and Deploy
+
+1. Open `Solution1.slnx` (or `Solution1.sln`) in Visual Studio.
+2. Set configuration to `Release` (or `Debug`) and platform to `x64` (or `ARM64`).
+3. Right-click the `ObsGameBarWidget` project in Solution Explorer and click **Deploy** (or press `F5`).
+4. Windows registers the widget extension automatically with the Xbox Game Bar system.
+
+### 3. Grant Localhost Loopback Exemption
+
+Windows UWP apps run inside an AppContainer isolation sandbox that blocks loopback network traffic (`localhost` / `127.0.0.1`) by default. To let the widget connect to OBS on port 4455, run this script once in PowerShell:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\ObsGameBarWidget\Enable-LoopbackExemption.ps1
 ```
 
-*(Cette étape n'a besoin d'être effectuée qu'une seule fois).*
+*(Note: The widget must be deployed at least once before running this script so Windows can identify its package name).*
 
 ---
 
-## 🎮 Étape 4 : Utiliser le widget dans la Game Bar
+## Usage
 
-1. Appuyez sur le raccourci clavier **`Touche Windows + G`** pour afficher la Game Bar.
-2. Cliquez sur l'icône **Menu des widgets** (la barre d'icônes tout en haut).
-3. Sélectionnez **OBS Controller** (vous pouvez cliquer sur l'étoile pour l'ajouter à vos favoris dans la barre principale).
-4. Le widget s'affiche :
-   * Si OBS est ouvert, il se connecte automatiquement.
-   * Vous pouvez cliquer sur l'icône d'engrenage ⚙️ pour ajuster l'IP, le port ou le mot de passe.
-5. **Astuce Pro :** Cliquez sur l'icône de l'**Épingle (📌)** sur la barre de titre du widget : il restera ainsi affiché par-dessus tous vos jeux pendant que vous jouez !
+1. Press `Win + G` to bring up the Xbox Game Bar overlay.
+2. Open the **Widget Menu** (top bar icon) and select **OBS Controller** (click the star to pin it to your favorites bar).
+3. The widget connects to OBS Studio automatically if OBS is running.
+4. Click the gear icon (`⚙`) to configure a custom host, port, or password if needed.
+5. Click the **Pin** icon on the widget's title bar to keep it permanently visible over your games.
 
 ---
 
-## 📁 Structure du Projet
+## Project Structure
 
 ```
 Solution1/
 ├── ObsGameBarWidget/
-│   ├── Assets/                       # Logos et icônes officielles du widget
+│   ├── Assets/                       # Application icons and branding assets
 │   ├── Converters/
-│   │   └── ValueConverters.cs        # Convertisseurs XAML (Mute, Scènes, Couleurs)
+│   │   └── ValueConverters.cs        # XAML binding converters (colors, scene state, mute)
 │   ├── Models/
-│   │   └── ObsModels.cs              # Modèles de données (Scènes, Audio, États)
+│   │   └── ObsModels.cs              # Data contracts for scenes, audio sources, and status
 │   ├── Services/
-│   │   ├── ObsWebSocketService.cs    # Client WebSocket OBS v5 (Auth SHA-256, RPC, Events)
-│   │   └── SettingsService.cs        # Persistance des paramètres locaux
-│   ├── App.xaml / App.xaml.cs        # Activation de protocole ms-gamebarwidget
-│   ├── MainPage.xaml / MainPage.xaml.cs # Interface XAML Fluent & Logique Game Bar
-│   ├── Package.appxmanifest          # Déclaration de l'extension Game Bar
-│   ├── Enable-LoopbackExemption.ps1  # Script d'exemption loopback UWP
-│   └── ObsGameBarWidget.csproj       # Fichier projet UWP C#
-├── Solution1.slnx                    # Solution Visual Studio vNext
-└── Solution1.sln                     # Solution Visual Studio standard
+│   │   ├── ObsWebSocketService.cs    # OBS WebSocket v5 client (SHA-256 auth, RPC, events)
+│   │   └── SettingsService.cs        # Local persistent configuration
+│   ├── App.xaml / App.xaml.cs        # Game Bar protocol activation (ms-gamebarwidget)
+│   ├── MainPage.xaml / .cs           # Fluent UI layout and Game Bar interaction logic
+│   ├── Package.appxmanifest          # UWP manifest and Game Bar extension declarations
+│   ├── Enable-LoopbackExemption.ps1  # One-time loopback exemption helper
+│   └── ObsGameBarWidget.csproj       # Project file
+├── Solution1.slnx                    # Visual Studio solution (XML format)
+└── Solution1.sln                     # Visual Studio solution (legacy format)
 ```
